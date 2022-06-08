@@ -1,0 +1,115 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion "29.0.3"
+
+    defaultConfig {
+        applicationId "com.raveena.fridgemanager"
+        minSdkVersion 16
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            testCoverageEnabled true
+        }
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+
+    dependencies {
+        implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+        implementation 'androidx.appcompat:appcompat:1.1.0'
+
+        // Adding for Card View
+        implementation "androidx.cardview:cardview:1.0.0"
+
+        implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+        implementation 'androidx.preference:preference:1.1.0-rc01'
+        testImplementation 'junit:junit:4.12'
+        testImplementation "org.mockito:mockito-all:2.0.2-beta"
+
+
+        // Optional -- Robolectric environment
+       //  androidTestImplementation "androidx.test:core: 1.3.0"
+       //  androidTestImplementation "org.roboletric:roboletric: 4.5.1"
+
+        testImplementation "org.mockito:mockito-core:1.9.5"
+        testImplementation "org.powermock:powermock-api-mockito:1.6.6"
+
+
+
+        androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+        androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+        androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+      //  androidTestImplementation 'androidx.support-annotations:28.0.0'
+        androidTestImplementation 'androidx.test:runner:1.0.2'
+//        androidTestImplementation 'androidx.test:rules:1.0.2'
+    //    androidTestImplementation 'androidx.test.uiautomator:uiautomator-v18:2.1.2'
+
+        // For Pie Chart
+        implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+        //implementation 'com.android.support:design:28.0.0'
+
+        // Material Design
+        implementation 'com.google.android.material:material:1.2.0-alpha03'
+
+        // Notification
+        implementation "com.android.support:support-compat:29.0.0"
+
+
+    }
+}
+apply plugin: 'jacoco'
+
+def androidExclusion = [
+        '**/databinding/**/*.*',
+        '**/android/databinding/*Binding.*',
+        '**/BR.*',
+        '**/R.*',
+        '**/R$*.*',
+        '**/BuildConfig.*',
+        '**/Manifest*.*',
+        '**/*_MembersInjector.*',
+        '**/Dagger*Component.*',
+        '**/Dagger*Component$Builder.*',
+        '**/*Module_*Factory.*',
+        '**/*Fragment*.*',
+        '**/*Activity*.*',
+        '**/*Adapter*.*',
+        '**/*ViewPager*.*',
+        '**/*ViewHolder*.*',
+        '**/*Module*.*'
+]
+
+task codeCoverageReport(type: JacocoReport, dependsOn: 'testStagingDebugUnitTest') {
+    group = "Reporting"
+    description = "Generate Jacoco coverage reports after running tests."
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+    classDirectories = fileTree(
+            dir: 'build/intermediates/classes/staging/debug/com/yourpackage',
+            excludes: androidExclusion
+    )
+    sourceDirectories = files('src/main/java/yourpackage')
+}
+
+task getCoverage(type: Exec, dependsOn: 'codeCoverageReport') {
+    group = "Reporting"
+    commandLine "open", "$buildDir/reports/jacoco/codeCoverageReport/html/index.html"
+}
